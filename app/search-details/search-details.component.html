@@ -1,0 +1,154 @@
+<div *ngIf="loading== 5&& !check" class = "container-fluid">
+  <div class = "col-md-8 offset-md-2">
+    <ngb-alert [type]="'danger'" [dismissible]="false" style="text-align: center;">
+      No result found! Please enter valid ticker.
+    </ngb-alert>
+  </div>
+</div>
+
+<div class = "col-md-8 offset-md-2">
+  <ngb-alert *ngIf="showAddWatchlist" [type]="'success'" [dismissible]="true" style="text-align: center;" (close)="showAddWatchlist = false">
+    {{ticker}} added to WatchList
+  </ngb-alert>
+  <ngb-alert *ngIf="showRemoveWatchlist" [type]="'danger'" [dismissible]="true" style="text-align: center;" (close)="showRemoveWatchlist = false">
+    {{ticker}} removed from WatchList
+  </ngb-alert>
+  <ngb-alert *ngIf="showBoughtSuccess" [type]="'success'" [dismissible]="true" style="text-align: center;" (close)="showBoughtSuccess = false">
+    {{ticker}} bought successfully
+  </ngb-alert>
+</div>
+
+
+<div class="row justify-content-center" *ngIf="loading<5">
+  <div class="col-auto align-self-center">
+    <mat-spinner diameter="80"></mat-spinner>
+  </div>
+</div>
+
+<div #generalInfo *ngIf="showGeneralInfo&&check&&loading == 5" class = "container">
+  <div class = "row justify-content-between">
+    <div class="col-6">
+      <h2>
+        {{summary.ticker}}
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-star" fill="currentColor" *ngIf="!inList" (click) = "update_watchList()">
+          <path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+        </svg>
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-star-fill" fill="orange" *ngIf="inList" (click) = "update_watchList()">
+          <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+        </svg>
+
+      </h2>
+      <h3 class="text-secondary"> {{summary.name}} </h3>
+      <small class="text-secondary"> {{summary.exchangeCode}} </small>
+      <br>
+      <br>
+      <button class="mr-auto btn buy" [disabled]="!openMarket" (click)="open(content)">
+        Buy
+      </button>
+    </div>
+    <div class = "col-auto" style="text-align: right">
+      <h2 style="color:{{markColor}};"> {{lastPrice.last| number:'1.2-2'}} </h2>
+      <h3 style="color:{{markColor}};">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-up-fill" fill="currentColor" *ngIf="isRaising">
+          <path d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+        </svg>
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-down-fill" fill="currentColor" *ngIf="!isRaising">
+          <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+        </svg>
+        {{amount | number:'1.2-2'}} ({{amountPercent | percent: '1.2-2'}})
+      </h3>
+      <small class="text-secondary"> {{curTime}} </small>
+    </div>
+  </div>
+  <div class = "row justify-content-center mt-1">
+    <div class = 'col-auto'>
+      <ngb-alert [type]="openMarket ? 'success' : 'danger'" [dismissible]="false" style="text-align: center; padding:2px;">
+        {{messageToShow}}
+      </ngb-alert>
+    </div>
+  </div>
+</div>
+
+<div #content class="container" style="text-align: center" *ngIf="loading == 5 && check">
+  <mat-tab-group mat-stretch-tabs (selectedTabChange)="rotate($event)">
+    <mat-tab label="Summary" aria-label="1">
+      <div class = "row w-100">
+        <div class = "col-md-6">
+          <div class = "row justify-content-between mt-3">
+            <div class ="col-6">
+              <ul style="list-style-type: none;text-align: justify;" class="p-0 p-md-2">
+                <li>High Price:&nbsp;&nbsp;{{lastPrice.high}}</li>
+                <li>Low Price:&nbsp;&nbsp;&nbsp;{{lastPrice.low}}</li>
+                <li>Open Price:&nbsp;{{lastPrice.open}}</li>
+                <li>Prev. Close:&nbsp;{{lastPrice.prevClose}}</li>
+                <li>Volume:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{lastPrice.volume}}</li>
+              </ul>
+            </div>
+            <div class = "col-6" *ngIf="openMarket">
+              <ul style="list-style-type: none;text-align: justify" class="p-0 p-md-2">
+                <li>Mid Price: {{lastPrice.mid}}</li>
+                <li>Ask Price: {{lastPrice.askPrice}}</li>
+                <li>Ask Size:  &nbsp;{{lastPrice.askSize}}</li>
+                <li>Bid Price: {{lastPrice.bidPrice}}</li>
+                <li>Bid Size:  &nbsp;{{lastPrice.bidSize}}</li>
+              </ul>
+            </div>
+          </div>
+          <div class = "row">
+            <h3 class = "col" style="font-weight: bold">Company's Description</h3>
+            <div class = "w-100"></div>
+            <div class = "col text-secondary" style="text-align: left">
+              Start Date: {{summary.startDate}}
+            </div>
+            <div class = "w-100"></div>
+            <div class = "col text-secondary" style="text-align: left; margin-top: 5%;">
+              {{summary.description}}
+            </div>
+          </div>
+        </div>
+        <div class = "col-md-6 col-12">
+          <app-daily-graph [parentData]="dailyCharts" [chartTitle] = "ticker" [raisingSign] = "isRaising"></app-daily-graph>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Top News" aria-label="2">
+      <app-news [newsContent] = "news"></app-news>
+    </mat-tab>
+    <mat-tab label="Charts" aria-label="3">
+      <ng-template matTabContent>
+          <app-historical-graph [historicalData] = "historicals" [chartTitle] = "ticker"></app-historical-graph>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<ng-template #content let-modal class="container p-1">
+  <div class = "modal-header">
+    <h4 class = "modal-title" id="buyInterface">{{ticker|uppercase}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="Qt = undefined; modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="Quantity">Current Price: {{lastPrice.last|number:'1.2-2'}}</label>
+      </div>
+      <div class="input-group">
+        <div class="row">
+          <div class="col-4">
+            <label style="padding-top: 0.5em">Quantity: </label>
+          </div>
+          <div class="col-6">
+            <input id="Quantity" [(ngModel)]="Qt" class="form-control" placeholder="0" name ="Qt" type="number">
+          </div>
+      </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer row justify-content-between">
+    <p class="col">Total: {{Qt?((Qt * lastPrice.last)|number:'1.2-2') : '0.00'}} </p>
+    <button type="button" class="col-auto buy btn" [disabled]="!Qt || Qt < 1 || !openMarket"  (click)="transact(Qt); showBoughtSuccess = true;
+      modal.close();">Buy</button>
+  </div>
+</ng-template>

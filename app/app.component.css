@@ -1,0 +1,35 @@
+.nav-link.active{
+  color:white !important;
+  border-radius: 5px;
+  border: 1px solid white;
+}
+
+nav-link{
+  color: grey !important;
+}
+
+a.nav-link:hover{
+  color: lightgray !important;
+}
+
+#page-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+#content-wrap {
+  padding-bottom: 5rem;    /* Footer height */
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 2.5rem; /* Footer height */
+  padding-bottom: 2em;
+  padding-top:2em;
+}
+
+.navbar-toggler{
+  color:white !important;
+}

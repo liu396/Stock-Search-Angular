@@ -1,0 +1,9 @@
+<highcharts-chart   *ngIf="isHighcharts"
+                    [Highcharts] = "Highcharts"
+                    [options] = "chartOptions"
+                    [constructorType]="chartType"
+                    (updateChange)="updateflag"
+
+                    style="width: 100%; display: block;"
+></highcharts-chart>
+

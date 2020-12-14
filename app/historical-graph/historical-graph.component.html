@@ -1,0 +1,24 @@
+<!--<div class="container-fluid p-md-0 p-sm-0">-->
+<!--  <div class="row w-100">-->
+<!--    <div class="col-12">-->
+<!--      <highcharts-chart-->
+<!--        [Highcharts]="Highcharts"-->
+<!--        [options]="chartOptions"-->
+<!--        [constructorType]="'stockChart'"-->
+<!--        (updateChange)="updateflag"-->
+
+<!--        style="width: 100%; display: block;"-->
+<!--      ></highcharts-chart>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<highcharts-chart
+  [Highcharts]="Highcharts"
+  [options]="chartOptions"
+  [constructorType]="'stockChart'"
+  (updateChange)="updateflag"
+
+  style="width: 100%; height: 80vh; display: block;"
+></highcharts-chart>
+

@@ -1,0 +1,30 @@
+button.buy{
+  color:white;
+  background-color: green;
+  margin-right: 5%;
+}
+
+button.buy_1{
+  color:white;
+  background-color: blue;
+  margin-right: 5%;
+}
+
+button.sell{
+  color:white;
+  background-color: red;
+  margin-right: 5%;
+}
+
+h1{
+  font-size: xx-large;
+  font-weight: bolder;
+}
+
+h2{
+  font-weight: bolder;
+}
+
+small{
+  color: gray;
+}

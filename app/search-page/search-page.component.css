@@ -1,0 +1,18 @@
+
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #6A50F2;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-end {
+  border-radius: 0 2em 2em 0 !important;
+  border-width: 0.2em !important;
+  flex-grow: 1;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-start {
+  border-radius: 2em 0 0 2em !important;
+  border-width: 0.2em !important;
+  flex-grow: 1;
+}
+

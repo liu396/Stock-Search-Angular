@@ -1,0 +1,144 @@
+<div class="container p-4">
+  <h1>My Portfolio</h1>
+</div>
+
+<div class="row justify-content-center" *ngIf="loading<numCounted">
+  <div class="col-auto align-self-center">
+    <mat-spinner diameter="80"></mat-spinner>
+  </div>
+</div>
+
+<div class="container" *ngIf="loading === numCounted && loading == 0">
+  <ngb-alert [type]="'warning'" [dismissible]="false" style="text-align: center;">
+    Currently you don't have any stock.
+  </ngb-alert>
+</div>
+
+<div class = "container" *ngIf="loading === numCounted && loading != 0">
+  <div class = "card m-3 p-0" *ngFor="let stock of stockName | keyvalue">
+    <div class="card-header p-2">
+      <h2 class="m-0">{{stock.key|uppercase}} <small>{{stockName[stock.key]}}</small></h2>
+    </div>
+    <div class="card-body">
+      <div class ="row justify-content-between">
+        <div class = "col-md-6">
+          <div class = "row justify-content-between">
+            <div class ="col-md-6 col-7">
+              <p class="m-1">Quantity:
+                <br>Avg. Cost/Share:
+                <br>Total Cost:
+              </p>
+            </div>
+            <div class ="col-md-5 col-4" style="text-align: right">
+              <p class="m-1">{{storage[(stock.key+'_2')]}}
+                <br>{{(storage[(stock.key+'_3')]/storage[(stock.key+'_2')])|number:'1.2-2'}}
+                <br>{{storage[(stock.key+'_3')]|number:'1.2-2'}}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class = "col-md-6">
+          <div class = "row justify-content-between">
+            <div class ="col-5">
+              <p class="m-1">Change:
+                <br>Current Price:
+                <br>Market Value:
+              </p>
+            </div>
+            <div class ="col-5" style="text-align: right; color:{{getColor(stock.key)}} " >
+              <p class="m-1">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-up-fill" fill="currentColor" *ngIf="stockFinance[(stock.key)] -
+              storage[(stock.key+'_3')]/storage[(stock.key+'_2')] > 0.0001">
+                  <path d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                </svg>
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-down-fill" fill="currentColor" *ngIf="stockFinance[(stock.key)] -
+              storage[(stock.key+'_3')]/storage[(stock.key+'_2')] < -0.0001">
+                  <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                </svg>
+                {{(stockFinance[(stock.key)] - storage[(stock.key+'_3')]/storage[(stock.key+'_2')]) | number:'1.2-2'}}
+                <br>{{stockFinance[(stock.key)]|number:'1.2-2'}}
+                <br>{{(storage[(stock.key+'_2')]*stockFinance[(stock.key)])|number:'1.2-2'}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class = "card-footer p-2">
+      <div class="row justify-content-end">
+        <button type="button" class="col-auto buy_1 btn" [disabled]="!openMarket" (click)="open(contentBuy, 'buyInterface'); focusedTicker = stock.key; buyingOrSelling = 0">
+          Buy
+        </button>
+        <button type="button" class="col-auto sell btn" [disabled]="!openMarket" (click)="open(contentSell, 'sellInterface'); focusedTicker = stock.key; buyingOrSelling = 1">
+          Sell
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #contentBuy let-modal>
+  <div class = "modal-header">
+    <h4 class = "modal-title" id="buyInterface">{{focusedTicker|uppercase}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="Qt=undefined; modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="QuantityBuy">Current Price: {{stockFinance[focusedTicker]}}</label>
+      </div>
+      <div class="input-group">
+        <div class="row">
+          <div class="col-4">
+            <label style="padding-top: 0.5em">Quantity: </label>
+          </div>
+          <div class="col-4">
+            <input id="QuantityBuy" [(ngModel)]="Qt" class="form-control" placeholder="0" name ="Qt" type="number">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer row justify-content-between">
+    <p class="col">Total: {{Qt?((Qt * stockFinance[focusedTicker])|number:'.2') : '0.00'}} </p>
+    <button type="button" class="col-auto buy btn" [disabled]="!Qt || Qt < 1"  (click)="transact(focusedTicker, Qt);
+        modal.close();">
+      Buy
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #contentSell let-modal>
+  <div class = "modal-header">
+    <h4 class = "modal-title" id="sellInterface">{{focusedTicker|uppercase}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="Qt=undefined; modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="QuantitySell">Current Price: {{stockFinance[focusedTicker]}}</label>
+      </div>
+      <div class="input-group">
+        <div class="row">
+          <div class="col-4">
+            <label style="padding-top: 0.5em">Quantity: </label>
+          </div>
+          <div class="col-4">
+            <input id="QuantitySell" [(ngModel)]="Qt" class="form-control" placeholder="0" name ="Qt" type="number">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer row justify-content-between">
+    <p class="col">Total: {{Qt?((Qt * stockFinance[focusedTicker])|number:'.2') : '0.00'}} </p>
+    <button type="button" class="col-auto buy btn" [disabled]="!Qt || Qt < 1 || Qt > storage[(focusedTicker +'_2')] || !openMarket"  (click)="transact(focusedTicker, Qt);
+        modal.close();">
+      Sell
+    </button>
+  </div>
+</ng-template>
